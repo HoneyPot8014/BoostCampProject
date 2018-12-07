@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.databinding.ObservableArrayList" />
+
+        <import type="com.leeyh.boostcampproject.model.MovieModel" />
+
+        <variable
+            name="mainHandler"
+            type="com.leeyh.boostcampproject.viewmodel.MainActivityViewModel" />
+
+        <variable
+            name="listItems"
+            type="ObservableArrayList&lt;MovieModel&gt;" />
+    </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -11,7 +28,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            app:layout_constraintEnd_toStartOf="@id/movie_search_button"
+            android:clickable="true"
+            android:onClick="@{mainHandler::onEditTextClicked}"
+            android:text="@={mainHandler.movieInfo}"
+            app:layout_constraintEnd_toStartOf="@+id/movie_search_button"
+            app:layout_constraintHorizontal_weight="7"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,8 +40,11 @@
             android:id="@+id/movie_search_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:onClick="@{mainHandler::onSearchBtnClicked}"
             android:text="@string/search"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintStart_toEndOf="@+id/movie_search_edit_text_view"
             app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.v7.widget.RecyclerView
@@ -30,7 +54,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/movie_search_edit_text_view">
+            app:layout_constraintTop_toBottomOf="@+id/movie_search_edit_text_view"
+            bind:scrolled="@{mainHandler.listener}"
+            bind:setItems="@{mainHandler.movieDataList}">
+
         </android.support.v7.widget.RecyclerView>
 
 

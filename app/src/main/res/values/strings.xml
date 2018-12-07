@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">부스트캠프 사전과제</string>
     <string name="search">검색</string>
+    <string name="can_not_research">정확한 검색을 위해서는 공백 조회는 불가합니다.</string>
+    <string name="check_network">네트워크 연결을 확인하세요</string>
 </resources>

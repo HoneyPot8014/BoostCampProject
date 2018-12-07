@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="movie"
+            type="com.leeyh.boostcampproject.model.MovieModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp">
+
+        <ImageView
+            android:id="@+id/movie_thumbnail_image_view"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            bind:loadImage="@{movie.image}"/>
+
+        <TextView
+            android:id="@+id/movie_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@{movie.title}"
+            app:layout_constraintStart_toEndOf="@id/movie_thumbnail_image_view"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RatingBar
+            android:id="@+id/rating_bar"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:numStars="5"
+            android:rating="@{movie.userRating / 2}"
+            app:layout_constraintStart_toEndOf="@id/movie_thumbnail_image_view"
+            app:layout_constraintTop_toBottomOf="@id/movie_title_text_view" />
+
+        <TextView
+            android:id="@+id/publish_date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@{movie.pubDate}"
+            app:layout_constraintStart_toEndOf="@id/movie_thumbnail_image_view"
+            app:layout_constraintTop_toBottomOf="@id/rating_bar" />
+
+        <TextView
+            android:id="@+id/director_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@{movie.director}"
+            app:layout_constraintStart_toEndOf="@id/movie_thumbnail_image_view"
+            app:layout_constraintTop_toBottomOf="@id/publish_date_text_view" />
+
+        <TextView
+            android:id="@+id/actor_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@{movie.actor}"
+            app:layout_constraintStart_toEndOf="@id/movie_thumbnail_image_view"
+            app:layout_constraintTop_toBottomOf="@id/director_text_view" />
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

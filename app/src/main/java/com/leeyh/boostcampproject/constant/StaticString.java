@@ -22,13 +22,16 @@ public class StaticString {
     public static final String COUNTRY = "country";
     public static final String YEAR_FROM = "yearfrom";
     public static final String YEAR_TO = "yearto";
+    public static final String TOTAL = "total";
+    public static final String ITEMS = "items";
+    public static final String LINK = "link";
+    public static final String IMAGE = "image";
 
     //cache info
-    private static final int MAX_MEMORY = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    public static final int CACHE_SIZE = MAX_MEMORY / 6;
+    public static final int CACHE_SIZE = 1024 * 1024 * 4;
 
     //default request StringQuery
-    public static final int DEFAULT_DISPLAY = 10;
-    public static final int DEFAULT_START = 1;
+    public static final String DEFAULT_DISPLAY = "10";
+    public static final String DEFAULT_START = "1";
 
 }

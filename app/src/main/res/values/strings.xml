@@ -3,4 +3,11 @@
     <string name="search">검색</string>
     <string name="can_not_research">정확한 검색을 위해서는 공백 조회는 불가합니다.</string>
     <string name="check_network">네트워크 연결을 확인하세요</string>
+    <string name="end_data">조회할 데이터가 없습니다.</string>
+    <string name="failed_load_image">이미지 로드에 실패했습니다.</string>
+    <string name="load_image_failed">네트워크에 연결되지 않아 이미지 로딩에 실패했습니다.</string>
+    <string name="wron_request_query">잘못된 검색어입니다.</string>
+    <string name="typo_check">검색어 오타를 확인하세요</string>
+    <string name="server_error">서버에 문제로 인해 검색이 불가능합니다.</string>
+    <string name="request_failed">요청 실패</string>
 </resources>

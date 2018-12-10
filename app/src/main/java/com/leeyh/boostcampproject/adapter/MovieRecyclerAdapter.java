@@ -1,22 +1,31 @@
 package com.leeyh.boostcampproject.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
-import android.databinding.ObservableArrayList;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.databinding.RecyclerViewItemBinding;
 import com.leeyh.boostcampproject.model.MovieModel;
+
+import java.util.ArrayList;
 
 
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.MovieViewHolder> {
 
-    private ObservableArrayList<MovieModel> items = new ObservableArrayList<>();
+    private ArrayList<MovieModel> mItems = new ArrayList<>();
+    private String mQuery;
+    private int mTotalSize;
+    private int mStartPoint;
+    private int mDisplayCount;
 
     static class MovieViewHolder extends RecyclerView.ViewHolder {
 
@@ -37,26 +46,60 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MovieViewHolder movieViewHolder, @SuppressLint("RecyclerView") final int i) {
-        movieViewHolder.mBinding.setMovie(items.get(i));
+    public void onBindViewHolder(@NonNull final MovieViewHolder movieViewHolder, @SuppressLint("RecyclerView") final int i) {
+        movieViewHolder.mBinding.setMovie(mItems.get(i));
         movieViewHolder.mBinding.executePendingBindings();
         movieViewHolder.mBinding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent link = new Intent(Intent.ACTION_VIEW, Uri.parse(items.get(i).getLink()));
-                view.getContext().startActivity(link);
+                Intent link = new Intent(Intent.ACTION_VIEW, Uri.parse(mItems.get(i).getLink()));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Bundle animation = ActivityOptions.makeCustomAnimation(view.getContext(), R.anim.enter, R.anim.exit).toBundle();
+                    view.getContext().startActivity(link, animation);
+                } else {
+                    view.getContext().startActivity(link);
+                }
             }
         });
     }
 
     @Override
-    public int getItemCount() {
-        return items.size();
+    public void onViewDetachedFromWindow(@NonNull MovieViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.mBinding.unbind();
     }
 
-    public void setItems(ObservableArrayList<MovieModel> movieDataList) {
-        items = movieDataList;
+    @Override
+    public int getItemCount() {
+        return mItems.size();
+    }
+
+    public void setItems(ArrayList<MovieModel> items) {
+        this.mItems = items;
         notifyDataSetChanged();
     }
 
+    public int getTotalSize() {
+        return mTotalSize;
+    }
+
+    public void setTotalSize(int totalSize) {
+        this.mTotalSize = totalSize;
+    }
+
+    public int getStartPoint() {
+        return mStartPoint;
+    }
+
+    public void setStartPoint(int startPoint) {
+        this.mStartPoint = startPoint;
+    }
+
+    public int getDisplayCount() {
+        return mDisplayCount;
+    }
+
+    public void setDisplayCount(int displayCount) {
+        this.mDisplayCount = displayCount;
+    }
 }

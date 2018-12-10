@@ -1,89 +1,110 @@
 package com.leeyh.boostcampproject.bindadapter;
 
-import android.annotation.SuppressLint;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.databinding.BindingAdapter;
-import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.adapter.MovieRecyclerAdapter;
+import com.leeyh.boostcampproject.helper.Cache;
+import com.leeyh.boostcampproject.helper.ExceptionHandle;
 import com.leeyh.boostcampproject.helper.Network;
 import com.leeyh.boostcampproject.model.MovieModel;
+import com.leeyh.boostcampproject.repository.MovieDataRepository;
+import com.leeyh.boostcampproject.repository.OnNetworkExceptionOccurred;
 
-import java.io.IOException;
-
-import static com.leeyh.boostcampproject.constant.StaticString.CACHE_SIZE;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class BindAdapter {
 
-    static LruCache<String, Bitmap> LRU_CACHE = new LruCache<>(CACHE_SIZE);
-
-    @BindingAdapter({"setItems"})
-    public static void bindItem(RecyclerView recyclerView, ObservableArrayList<MovieModel> items) {
-        MovieRecyclerAdapter adapter = (MovieRecyclerAdapter) recyclerView.getAdapter();
+    @BindingAdapter(value = {"setItems", "totalData", "startPoint", "displayCount"})
+    public static void bindItem(RecyclerView recyclerView, MutableLiveData<ArrayList<MovieModel>> items, MutableLiveData<Integer> totalData
+            , MutableLiveData<Integer> startPoint, MutableLiveData<Integer> displayCount) {
+        final MovieRecyclerAdapter adapter = (MovieRecyclerAdapter) recyclerView.getAdapter();
         if (adapter != null) {
-            adapter.setItems(items);
+            items.observeForever(new Observer<ArrayList<MovieModel>>() {
+                @Override
+                public void onChanged(@Nullable ArrayList<MovieModel> movieModels) {
+                    adapter.setItems(movieModels);
+                }
+            });
+            totalData.observeForever(new Observer<Integer>() {
+                @Override
+                public void onChanged(@Nullable Integer integer) {
+                    adapter.setTotalSize(integer);
+                }
+            });
+            startPoint.observeForever(new Observer<Integer>() {
+                @Override
+                public void onChanged(@Nullable Integer integer) {
+                    adapter.setStartPoint(integer);
+                }
+            });
+            displayCount.observeForever(new Observer<Integer>() {
+                @Override
+                public void onChanged(@Nullable Integer integer) {
+
+                }
+            });
         }
     }
 
     @BindingAdapter({"loadImage"})
-    public static void loadImage(ImageView imageView, String url) {
-        if (LRU_CACHE.get(url) == null) {
-            new AsyncLoadImage(imageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url);
+    public static void loadImage(final ImageView imageView, String url) {
+        LruCache<String, Bitmap> cache = Cache.getCache();
+        Network network = new Network();
+        MovieDataRepository movieDataRepository = new MovieDataRepository(new OnNetworkExceptionOccurred() {
+            @Override
+            public void onHandleError(Exception e) {
+                ExceptionHandle.handleError(imageView.getContext(), e);
+            }
+        });
+        if (url == null || url.equals("")) {
+            imageView.setImageResource(R.drawable.no_image);
+            return;
+        }
+        if (cache.get(url) == null) {
+            if (network.networkStatus(imageView.getContext())) {
+                try {
+                    Bitmap bitmap = movieDataRepository.loadImage(url);
+                    if (bitmap != null) {
+                        cache.put(url, bitmap);
+                        imageView.setImageBitmap(bitmap);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Toast.makeText(imageView.getContext(), R.string.failed_load_image, Toast.LENGTH_SHORT).show();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                    Toast.makeText(imageView.getContext(), R.string.failed_load_image, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(imageView.getContext(), R.string.load_image_failed, Toast.LENGTH_SHORT).show();
+            }
         } else {
-            imageView.setImageBitmap(LRU_CACHE.get(url));
+            imageView.setImageBitmap(cache.get(url));
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @BindingAdapter({"scrolled"})
-    public static void requestWhenScrollRecyclerView(RecyclerView recyclerView, View.OnScrollChangeListener listener) {
-        recyclerView.setOnScrollChangeListener(listener);
-//        recyclerView.setOnScrollListener(listener);
+    public static void requestWhenScrollRecyclerView(RecyclerView recyclerView, RecyclerView.OnScrollListener listener) {
+        recyclerView.addOnScrollListener(listener);
     }
 
-
-    private static class AsyncLoadImage extends AsyncTask<String, Void, Bitmap> {
-
-        @SuppressLint("StaticFieldLeak")
-        private ImageView mImageView;
-
-        AsyncLoadImage(ImageView mImageView) {
-            this.mImageView = mImageView;
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-            Network network = new Network();
-            Bitmap bitmap = null;
-            try {
-                bitmap = network.loadImage(strings[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (bitmap != null) {
-                LRU_CACHE.put(strings[0], bitmap);
-                return bitmap;
-            } else {
-                return bitmap;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if (bitmap == null) {
-                mImageView.setImageResource(R.drawable.no_image);
-            } else {
-                mImageView.setImageBitmap(bitmap);
-            }
-        }
+    @BindingAdapter({"parsingText"})
+    public static void setText(TextView textView, String rowData) {
+        String parsedString = rowData.replace("<b>", "").replace("</b>", "");
+        textView.setText(parsedString);
     }
 }

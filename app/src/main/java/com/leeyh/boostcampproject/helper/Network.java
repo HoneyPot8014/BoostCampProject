@@ -5,14 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,11 +25,14 @@ import static com.leeyh.boostcampproject.constant.StaticString.SECRET_ID_VALUE;
 
 public class Network {
 
+    public HttpURLConnection urlConnection;
+    public BufferedReader reader;
+
     public boolean networkStatus(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if(networkInfo != null) {
-            if(networkInfo.isConnected()) {
+        if (networkInfo != null) {
+            if (networkInfo.isConnected()) {
                 return true;
             } else return false;
         } else {
@@ -38,7 +40,7 @@ public class Network {
         }
     }
 
-    public String request(Map<String, String> queryString) throws IOException {
+    public String request(Map<String, String> queryString) throws ResponseException, IOException {
         StringBuilder params = new StringBuilder();
         Iterator<String> iterator = queryString.keySet().iterator();
         while (iterator.hasNext()) {
@@ -50,12 +52,11 @@ public class Network {
             }
         }
         String url = API_URL + params;
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
+        urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod(GET);
         urlConnection.setRequestProperty(CLIENT_ID, CLIENT_ID_VALUE);
         urlConnection.setRequestProperty(SECRET_ID, SECRET_ID_VALUE);
         urlConnection.setUseCaches(false);
-        BufferedReader reader;
         int responseCode = urlConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8"));
@@ -63,11 +64,10 @@ public class Network {
             reader = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
             reader.close();
             urlConnection.disconnect();
-            throw new Error(getResult(reader));
+            throw new ResponseException(responseCode);
         }
 
         String result = getResult(reader);
-        Log.d("확인", "request: " + result);
         reader.close();
         urlConnection.disconnect();
         return result;
@@ -82,11 +82,12 @@ public class Network {
         return builder.toString();
     }
 
-    public Bitmap loadImage(String url) throws IOException {
-        Bitmap imageBitmap = null;
+    public Bitmap loadImage(@Nullable String url) throws IOException {
+        if (url == null || url.equals("")) {
+            return null;
+        }
         InputStream inputStream = new URL(url).openStream();
-        imageBitmap = BitmapFactory.decodeStream(inputStream);
-        return imageBitmap;
+        return BitmapFactory.decodeStream(inputStream);
     }
 
 }

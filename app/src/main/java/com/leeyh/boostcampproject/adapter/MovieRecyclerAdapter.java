@@ -22,10 +22,6 @@ import java.util.ArrayList;
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.MovieViewHolder> {
 
     private ArrayList<MovieModel> mItems = new ArrayList<>();
-    private String mQuery;
-    private int mTotalSize;
-    private int mStartPoint;
-    private int mDisplayCount;
 
     static class MovieViewHolder extends RecyclerView.ViewHolder {
 
@@ -77,29 +73,5 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     public void setItems(ArrayList<MovieModel> items) {
         this.mItems = items;
         notifyDataSetChanged();
-    }
-
-    public int getTotalSize() {
-        return mTotalSize;
-    }
-
-    public void setTotalSize(int totalSize) {
-        this.mTotalSize = totalSize;
-    }
-
-    public int getStartPoint() {
-        return mStartPoint;
-    }
-
-    public void setStartPoint(int startPoint) {
-        this.mStartPoint = startPoint;
-    }
-
-    public int getDisplayCount() {
-        return mDisplayCount;
-    }
-
-    public void setDisplayCount(int displayCount) {
-        this.mDisplayCount = displayCount;
     }
 }

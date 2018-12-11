@@ -11,9 +11,9 @@
             name="mainHandler"
             type="com.leeyh.boostcampproject.viewmodel.MainActivityViewModel" />
 
-        <variable
-            name="listItems"
-            type="android.arch.lifecycle.MutableLiveData&lt;java.util.ArrayList&lt;com.leeyh.boostcampproject.model.MovieModel&gt;&gt;" />
+        <!--<variable-->
+        <!--name="listItems"-->
+        <!--type="android.arch.lifecycle.MutableLiveData&lt;java.util.ArrayList&lt;com.leeyh.boostcampproject.model.MovieModel&gt;&gt;" />-->
 
         <variable
             name="total"
@@ -44,12 +44,12 @@
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:maxLines="1"
-            android:onClick="@{mainHandler::onEditTextClicked}"
             android:text="@={mainHandler.mEditTextGetText}"
             app:layout_constraintEnd_toStartOf="@+id/movie_search_button"
             app:layout_constraintHorizontal_weight="7"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            bind:searchTextClicked="@{mainHandler.onEditTextTouchedListener}" />
 
         <Button
             android:id="@+id/movie_search_button"
@@ -70,11 +70,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/movie_search_edit_text_view"
-            bind:displayCount="@{display}"
-            bind:scrolled="@{mainHandler.listener}"
-            bind:setItems="@{listItems}"
-            bind:startPoint="@{start}"
-            bind:totalData="@{total}" />
+            bind:scrolled="@{mainHandler.onScrollEndListener}"
+            bind:setItems="@{mainHandler.mLiveMovieList}" />
 
         <TextView
             android:id="@+id/no_result_text_view"
@@ -83,19 +80,10 @@
             android:layout_marginTop="10dp"
             android:text="검색 조회 결과가 없습니다."
             android:textSize="20sp"
+            android:visibility="@{mainHandler.mMovieListSize==0? View.VISIBLE : View.GONE, default=visible}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/movie_search_edit_text_view" />
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/movie_result_recycler_view" />
-
 
     </android.support.constraint.ConstraintLayout>
 

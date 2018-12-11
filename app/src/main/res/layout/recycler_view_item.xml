@@ -4,6 +4,7 @@
     xmlns:bind="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="movie"
             type="com.leeyh.boostcampproject.model.MovieModel" />

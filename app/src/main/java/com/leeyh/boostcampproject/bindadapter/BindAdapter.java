@@ -4,12 +4,11 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,33 +27,14 @@ import java.util.concurrent.ExecutionException;
 
 public class BindAdapter {
 
-    @BindingAdapter(value = {"setItems", "totalData", "startPoint", "displayCount"})
-    public static void bindItem(RecyclerView recyclerView, MutableLiveData<ArrayList<MovieModel>> items, MutableLiveData<Integer> totalData
-            , MutableLiveData<Integer> startPoint, MutableLiveData<Integer> displayCount) {
+    @BindingAdapter({"setItems"})
+    public static void bindItem(RecyclerView recyclerView, MutableLiveData<ArrayList<MovieModel>> items) {
         final MovieRecyclerAdapter adapter = (MovieRecyclerAdapter) recyclerView.getAdapter();
         if (adapter != null) {
             items.observeForever(new Observer<ArrayList<MovieModel>>() {
                 @Override
                 public void onChanged(@Nullable ArrayList<MovieModel> movieModels) {
                     adapter.setItems(movieModels);
-                }
-            });
-            totalData.observeForever(new Observer<Integer>() {
-                @Override
-                public void onChanged(@Nullable Integer integer) {
-                    adapter.setTotalSize(integer);
-                }
-            });
-            startPoint.observeForever(new Observer<Integer>() {
-                @Override
-                public void onChanged(@Nullable Integer integer) {
-                    adapter.setStartPoint(integer);
-                }
-            });
-            displayCount.observeForever(new Observer<Integer>() {
-                @Override
-                public void onChanged(@Nullable Integer integer) {
-
                 }
             });
         }
@@ -106,5 +86,10 @@ public class BindAdapter {
     public static void setText(TextView textView, String rowData) {
         String parsedString = rowData.replace("<b>", "").replace("</b>", "");
         textView.setText(parsedString);
+    }
+
+    @BindingAdapter({"searchTextClicked"})
+    public static void setTouchListener(EditText editText, View.OnTouchListener listener) {
+        editText.setOnTouchListener(listener);
     }
 }

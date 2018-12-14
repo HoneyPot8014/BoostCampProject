@@ -1,6 +1,5 @@
 package com.leeyh.boostcampproject.repository;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -49,8 +48,8 @@ public class MovieDataRepository {
         this.mGson = new Gson();
     }
 
-    public ArrayList<MovieModel> getMovieList(String query, String start, Context context) throws ExecutionException, InterruptedException, JSONException {
-        String response = new AsyncRequest(mNetworkExceptionListener, mNetworkStatusListener, context).execute(query, start).get();
+    public ArrayList<MovieModel> getMovieList(String query, String start) throws ExecutionException, InterruptedException, JSONException {
+        String response = new AsyncRequest(mNetworkExceptionListener, mNetworkStatusListener).execute(query, start).get();
         ArrayList<MovieModel> items = new ArrayList<>();
         JSONObject parsedResponse = new JSONObject(response);
         JSONArray responseItems = parsedResponse.getJSONArray(ITEMS);
@@ -64,8 +63,12 @@ public class MovieDataRepository {
         return items;
     }
 
-    public Bitmap loadImage(String url) throws ExecutionException, InterruptedException {
-        return new AsyncLoadImage(mNetworkExceptionListener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url).get();
+    public Bitmap loadImage(String... url) throws ExecutionException, InterruptedException {
+        if (mNetworkStatusListener == null) {
+            return new AsyncLoadImage(mNetworkExceptionListener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url).get();
+        } else {
+            return new AsyncLoadImage(mNetworkExceptionListener, mNetworkStatusListener).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, url).get();
+        }
     }
 
     public String getQuery() {
@@ -85,20 +88,16 @@ public class MovieDataRepository {
         private Network mNetwork;
         private OnNetworkExceptionOccurred mNetworkExceptionListener;
         private OnNetworkStatusListener mNetworkStatusListener;
-        private ProgressDialog asyncDialog;
 
-        AsyncRequest(OnNetworkExceptionOccurred networkListener, OnNetworkStatusListener workingListener, Context context) {
+        AsyncRequest(OnNetworkExceptionOccurred networkListener, OnNetworkStatusListener workingListener) {
             this.mNetwork = new Network();
             this.mNetworkExceptionListener = networkListener;
             this.mNetworkStatusListener = workingListener;
-            this.asyncDialog = new ProgressDialog(context);
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("로딩중입니다..");
         }
 
         @Override
         protected void onPreExecute() {
-            asyncDialog.show();
+            super.onPreExecute();
             mNetworkStatusListener.onNetworkStart();
         }
 
@@ -120,6 +119,13 @@ public class MovieDataRepository {
             } catch (ResponseException e) {
                 e.printStackTrace();
                 publishProgress(e);
+            } finally {
+                try {
+                    mNetwork.reader.close();
+                    mNetwork.urlConnection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             return result;
         }
@@ -138,7 +144,6 @@ public class MovieDataRepository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mNetworkStatusListener.onNetworkFinished();
         }
 
         @Override
@@ -146,19 +151,25 @@ public class MovieDataRepository {
             try {
                 JSONObject receivedJSON = new JSONObject(s);
                 JSONArray items = receivedJSON.getJSONArray(ITEMS);
+                String[] urls = new String[items.length()];
                 for (int i = 0; i < items.length(); i++) {
-                    String image = ((JSONObject) items.get(i)).getString(IMAGE);
-                    new MovieDataRepository(mNetworkExceptionListener, mNetworkStatusListener).loadImage(image);
+                    urls[i] = ((JSONObject) items.get(i)).getString(IMAGE);
                 }
+                new MovieDataRepository(mNetworkExceptionListener, mNetworkStatusListener).loadImage(urls);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    mNetwork.reader.close();
+                    mNetwork.urlConnection.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            mNetworkStatusListener.onNetworkFinished();
-            asyncDialog.dismiss();
         }
 
         private void handleError(Exception e) {
@@ -172,20 +183,31 @@ public class MovieDataRepository {
 
         private Network mNetwork;
         private OnNetworkExceptionOccurred mNetworkExceptionListener;
+        private OnNetworkStatusListener mNetworkStatusListener;
 
         AsyncLoadImage(OnNetworkExceptionOccurred networkListener) {
             this.mNetwork = new Network();
             this.mNetworkExceptionListener = networkListener;
         }
 
+        AsyncLoadImage(OnNetworkExceptionOccurred networkListener, OnNetworkStatusListener networkStatusListener) {
+            this.mNetwork = new Network();
+            this.mNetworkExceptionListener = networkListener;
+            this.mNetworkStatusListener = networkStatusListener;
+        }
+
         @Override
         protected Bitmap doInBackground(String... strings) {
             Bitmap bitmap = null;
-            if (strings[0] != null && !strings[0].equals("")) {
+            if (strings != null) {
                 try {
-                    bitmap = mNetwork.loadImage(strings[0]);
-                    if (bitmap != null) {
-                        Cache.getCache().put(strings[0], bitmap);
+                    for (String string : strings) {
+                        if (!string.equals("") || Cache.getCache().get(string) == null) {
+                            bitmap = mNetwork.loadImage(string);
+                            if (bitmap != null) {
+                                Cache.getCache().put(strings[0], bitmap);
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -216,6 +238,14 @@ public class MovieDataRepository {
                 mNetwork.urlConnection.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if (mNetworkStatusListener != null) {
+                mNetworkStatusListener.onNetworkFinished();
             }
         }
 

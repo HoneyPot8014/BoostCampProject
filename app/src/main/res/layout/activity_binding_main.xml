@@ -80,7 +80,7 @@
             android:layout_marginTop="10dp"
             android:text="검색 조회 결과가 없습니다."
             android:textSize="20sp"
-            android:visibility="@{mainHandler.mMovieListSize==0? View.VISIBLE : View.GONE, default=visible}"
+            android:visibility="@{mainHandler.mMovieListSize==0? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/movie_search_edit_text_view" />

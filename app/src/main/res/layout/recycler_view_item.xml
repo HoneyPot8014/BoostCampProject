@@ -8,12 +8,17 @@
         <variable
             name="movie"
             type="com.leeyh.boostcampproject.model.MovieModel" />
+
+        <variable
+            name="itemHandler"
+            type="com.leeyh.boostcampproject.viewmodel.RecyclerItemViewModel"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:onClick="@{itemHandler::onItemClicked}">
 
         <ImageView
             android:id="@+id/movie_thumbnail_image_view"

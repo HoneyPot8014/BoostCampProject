@@ -31,12 +31,7 @@ public class BindAdapter {
     public static void bindItem(RecyclerView recyclerView, MutableLiveData<ArrayList<MovieModel>> items) {
         final MovieRecyclerAdapter adapter = (MovieRecyclerAdapter) recyclerView.getAdapter();
         if (adapter != null) {
-            items.observeForever(new Observer<ArrayList<MovieModel>>() {
-                @Override
-                public void onChanged(@Nullable ArrayList<MovieModel> movieModels) {
-                    adapter.setItems(movieModels);
-                }
-            });
+            adapter.setItems(items.getValue());
         }
     }
 

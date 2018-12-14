@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_binding_main);
-        MainActivityViewModel.Factory factory = new MainActivityViewModel.Factory(getApplicationContext());
+        MainActivityViewModel.MovieViewModelClassFactory factory = new MainActivityViewModel.MovieViewModelClassFactory(this);
         final MainActivityViewModel handler = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
         mBinding.setMainHandler(handler);
         mBinding.setLifecycleOwner(this);

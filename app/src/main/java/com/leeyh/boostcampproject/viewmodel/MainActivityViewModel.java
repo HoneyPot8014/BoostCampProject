@@ -1,11 +1,16 @@
 package com.leeyh.boostcampproject.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,7 +38,9 @@ public class MainActivityViewModel extends ViewModel {
     private ArrayList<MovieModel> mMovieDataList;
     private Network mNetwork;
     private boolean shouldShowEndData;
+    private Dialog progress;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private MainActivityViewModel(final Context context) {
 
         this.mLiveMovieList = new MutableLiveData<>();
@@ -42,6 +49,11 @@ public class MainActivityViewModel extends ViewModel {
         this.mMovieDataList = new ArrayList<>();
         this.mNetwork = new Network();
         this.shouldShowEndData = true;
+
+        AlertDialog.Builder progressBuilder = new AlertDialog.Builder(context);
+        progressBuilder.setView(R.layout.progress);
+        progress = progressBuilder.create();
+
         this.mRepository = new MovieDataRepository(new OnNetworkExceptionOccurred() {
             @Override
             public void onHandleError(Exception e) {
@@ -51,33 +63,39 @@ public class MainActivityViewModel extends ViewModel {
 
             @Override
             public void onNetworkStart() {
+                progress.show();
             }
 
             @Override
             public void onNetworkFinished() {
+                if (progress.isShowing()) {
+                    progress.dismiss();
+                }
             }
         });
         //to handle not exist movieList. before networking and get response, set value
+        mLiveMovieList.setValue(mMovieDataList);
         mMovieListSize.setValue(1);
         shouldShowEndData = false;
     }
 
-    public static class Factory extends ViewModelProvider.NewInstanceFactory {
+    public static class MovieViewModelClassFactory extends ViewModelProvider.NewInstanceFactory {
 
         @NonNull
         private Context mContext;
 
-        public Factory(@NonNull Context context) {
+        public MovieViewModelClassFactory(@NonNull Context context) {
             mContext = context;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @NonNull
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (modelClass.isAssignableFrom(MainActivityViewModel.class)) {
                 return (T) new MainActivityViewModel(mContext);
             }
-            return null;
+            throw new Fragment.InstantiationException("not viewModel class", null);
         }
     }
 
@@ -97,12 +115,11 @@ public class MainActivityViewModel extends ViewModel {
     public void onSearchBtnClicked(final View view) {
         InputMethodManager mInputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
         if (mNetwork.networkStatus(view.getContext())) {
             if (queryCheck(view)) {
                 mMovieDataList.clear();
                 try {
-                    mMovieDataList = mRepository.getMovieList(mEditTextGetText.getValue(), DEFAULT_START, view.getContext());
+                    mMovieDataList = mRepository.getMovieList(mEditTextGetText.getValue(), DEFAULT_START);
                     mLiveMovieList.setValue(mMovieDataList);
                     mMovieListSize.setValue(mRepository.getTotal());
                     shouldShowEndData = true;
@@ -136,8 +153,7 @@ public class MainActivityViewModel extends ViewModel {
                 if (mMovieDataList.size() < mRepository.getTotal()) {
                     if (mNetwork.networkStatus(recyclerView.getContext())) {
                         try {
-                            ArrayList<MovieModel> items = mRepository.getMovieList(mRepository.getQuery(), String.valueOf(mRepository.getStart() + 10), recyclerView.getContext());
-                            mMovieDataList.addAll(items);
+                            mMovieDataList.addAll(mRepository.getMovieList(mRepository.getQuery(), String.valueOf(mRepository.getStart() + 10)));
                             mLiveMovieList.setValue(mMovieDataList);
                         } catch (Exception e) {
                             ExceptionHandle.handleError(recyclerView.getContext(), e);

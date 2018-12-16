@@ -9,7 +9,7 @@
 
         <variable
             name="mainHandler"
-            type="com.leeyh.boostcampproject.viewmodel.MainActivityViewModel" />
+            type="com.leeyh.boostcampproject.viewmodel.MovieListViewModel" />
 
         <!--<variable-->
         <!--name="listItems"-->

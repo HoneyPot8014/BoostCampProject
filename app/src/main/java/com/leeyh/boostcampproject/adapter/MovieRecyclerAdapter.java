@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.leeyh.boostcampproject.databinding.RecyclerViewItemBinding;
 import com.leeyh.boostcampproject.helper.ListDiffUtil;
 import com.leeyh.boostcampproject.model.MovieModel;
-import com.leeyh.boostcampproject.viewmodel.MainActivityViewModel;
+import com.leeyh.boostcampproject.viewmodel.MovieListViewModel;
 
 import java.util.ArrayList;
 
@@ -47,9 +47,9 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     @Override
     public void onBindViewHolder(@NonNull final MovieViewHolder movieViewHolder, @SuppressLint("RecyclerView") final int i) {
         //instance ViewModel and bind
-        MainActivityViewModel.MovieViewModelClassFactory factory =
-                new MainActivityViewModel.MovieViewModelClassFactory(movieViewHolder.mBinding.getRoot().getContext());
-        MainActivityViewModel viewModel = ViewModelProviders.of(mActivity, factory).get(MainActivityViewModel.class);
+        MovieListViewModel.MovieViewModelClassFactory factory =
+                new MovieListViewModel.MovieViewModelClassFactory(movieViewHolder.mBinding.getRoot().getContext());
+        MovieListViewModel viewModel = ViewModelProviders.of(mActivity, factory).get(MovieListViewModel.class);
         RecyclerViewItemBinding binding = movieViewHolder.mBinding;
         binding.setItemHandler(viewModel);
         binding.setMovie(mItems.get(i));

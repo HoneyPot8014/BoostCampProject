@@ -8,20 +8,20 @@ import android.support.v7.widget.LinearLayoutManager;
 
 import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.adapter.MovieRecyclerAdapter;
-import com.leeyh.boostcampproject.databinding.ActivityBindingMainBinding;
-import com.leeyh.boostcampproject.viewmodel.MainActivityViewModel;
+import com.leeyh.boostcampproject.databinding.ActivityBindingMovieListMainBinding;
+import com.leeyh.boostcampproject.viewmodel.MovieListViewModel;
 
-public class MainActivity extends AppCompatActivity {
+public class MovieListActivity extends AppCompatActivity {
 
-    ActivityBindingMainBinding mBinding;
+    ActivityBindingMovieListMainBinding mBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_binding_main);
-        MainActivityViewModel.MovieViewModelClassFactory factory = new MainActivityViewModel.MovieViewModelClassFactory(this);
-        final MainActivityViewModel handler = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_binding_movie_list_main);
+        MovieListViewModel.MovieViewModelClassFactory factory = new MovieListViewModel.MovieViewModelClassFactory(this);
+        final MovieListViewModel handler = ViewModelProviders.of(this, factory).get(MovieListViewModel.class);
         mBinding.setMainHandler(handler);
         mBinding.setLifecycleOwner(this);
 

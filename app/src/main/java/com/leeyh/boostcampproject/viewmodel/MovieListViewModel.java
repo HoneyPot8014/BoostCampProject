@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import static com.leeyh.boostcampproject.constant.StaticString.DEFAULT_START;
 
-public class MainActivityViewModel extends ViewModel {
+public class MovieListViewModel extends ViewModel {
 
     public MutableLiveData<String> mEditTextGetText;
     public MutableLiveData<ArrayList<MovieModel>> mLiveMovieList;
@@ -45,7 +45,7 @@ public class MainActivityViewModel extends ViewModel {
     private Dialog progress;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private MainActivityViewModel(final Context context) {
+    private MovieListViewModel(final Context context) {
 
         this.mLiveMovieList = new MutableLiveData<>();
         this.mEditTextGetText = new MutableLiveData<>();
@@ -97,8 +97,8 @@ public class MainActivityViewModel extends ViewModel {
         @NonNull
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            if (modelClass.isAssignableFrom(MainActivityViewModel.class)) {
-                return (T) new MainActivityViewModel(mContext);
+            if (modelClass.isAssignableFrom(MovieListViewModel.class)) {
+                return (T) new MovieListViewModel(mContext);
             }
             throw new Fragment.InstantiationException("not viewModel class", null);
         }

@@ -10,7 +10,7 @@
 
         <variable
             name="itemHandler"
-            type="com.leeyh.boostcampproject.viewmodel.MainActivityViewModel"/>
+            type="com.leeyh.boostcampproject.viewmodel.MovieListViewModel"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

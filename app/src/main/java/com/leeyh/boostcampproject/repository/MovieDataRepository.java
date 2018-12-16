@@ -95,8 +95,8 @@ public class MovieDataRepository {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
             mNetworkStatusListener.onNetworkStart();
+            super.onPreExecute();
         }
 
         @Override
@@ -135,13 +135,13 @@ public class MovieDataRepository {
 
         @Override
         protected void onCancelled() {
-            super.onCancelled();
             try {
                 mNetwork.reader.close();
                 mNetwork.urlConnection.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            super.onCancelled();
         }
 
         @Override
@@ -205,6 +205,7 @@ public class MovieDataRepository {
                                 //if interrupted close IO
                                 mNetwork.reader.close();
                                 mNetwork.urlConnection.disconnect();
+                                return bitmap;
                             }
                         }
                     }
@@ -224,17 +225,28 @@ public class MovieDataRepository {
         }
 
         @Override
+        protected void onCancelled(Bitmap bitmap) {
+            try {
+                mNetwork.reader.close();
+                mNetwork.urlConnection.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            super.onCancelled(bitmap);
+        }
+
+        @Override
         protected void onProgressUpdate(Exception... values) {
-            super.onProgressUpdate(values);
             handleError(values[0]);
+            super.onProgressUpdate(values);
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
             if (mNetworkStatusListener != null) {
                 mNetworkStatusListener.onNetworkFinished();
             }
+            super.onPostExecute(bitmap);
         }
 
         private void handleError(Exception e) {

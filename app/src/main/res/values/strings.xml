@@ -10,4 +10,5 @@
     <string name="typo_check">검색어 오타를 확인하세요</string>
     <string name="server_error">서버에 문제로 인해 검색이 불가능합니다.</string>
     <string name="request_failed">요청 실패</string>
+    <string name="progressbar_message">로딩중입니다..</string>
 </resources>

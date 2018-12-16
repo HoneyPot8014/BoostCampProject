@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding.setMainHandler(handler);
         mBinding.setLifecycleOwner(this);
 
-        MovieRecyclerAdapter recyclerAdapter = new MovieRecyclerAdapter();
+        MovieRecyclerAdapter recyclerAdapter = new MovieRecyclerAdapter(this);
         mBinding.movieResultRecyclerView.setAdapter(recyclerAdapter);
         mBinding.movieResultRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
     }

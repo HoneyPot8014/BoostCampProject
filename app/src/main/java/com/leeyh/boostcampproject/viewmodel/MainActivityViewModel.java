@@ -1,13 +1,17 @@
 package com.leeyh.boostcampproject.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
@@ -173,4 +177,14 @@ public class MainActivityViewModel extends ViewModel {
             }
         }
     };
+
+    public void onRecyclerItemViewClicked(View view, MovieModel movieModel) {
+        Intent link = new Intent(Intent.ACTION_VIEW, Uri.parse(movieModel.getLink()));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Bundle animation = ActivityOptions.makeCustomAnimation(view.getContext(), R.anim.enter, R.anim.exit).toBundle();
+                    view.getContext().startActivity(link, animation);
+                } else {
+                    view.getContext().startActivity(link);
+                }
+    }
 }

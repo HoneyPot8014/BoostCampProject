@@ -1,7 +1,6 @@
 package com.leeyh.boostcampproject.helper;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.leeyh.boostcampproject.R;
@@ -9,7 +8,6 @@ import com.leeyh.boostcampproject.R;
 public class ExceptionHandle {
 
     public static void handleError(Context context, Exception e) {
-        Log.d("에러처리", "handleError: " + e);
         if (e instanceof ResponseException) {
             int responseCode = ((ResponseException) e).getRequestCode();
             switch (responseCode) {

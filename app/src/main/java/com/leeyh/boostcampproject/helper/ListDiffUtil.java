@@ -6,12 +6,12 @@ import com.leeyh.boostcampproject.model.MovieModel;
 
 import java.util.ArrayList;
 
-public class ListDiffUtill extends DiffUtil.Callback {
+public class ListDiffUtil extends DiffUtil.Callback {
 
     private ArrayList<MovieModel> mOldList;
     private ArrayList<MovieModel> mNewList;
 
-    public ListDiffUtill(ArrayList<MovieModel> oldMovieList, ArrayList<MovieModel> newMovieList) {
+    public ListDiffUtil(ArrayList<MovieModel> oldMovieList, ArrayList<MovieModel> newMovieList) {
         this.mOldList = oldMovieList;
         this.mNewList = newMovieList;
     }

@@ -32,9 +32,7 @@ public class Network {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null) {
-            if (networkInfo.isConnected()) {
-                return true;
-            } else return false;
+            return networkInfo.isConnected();
         } else {
             return false;
         }
@@ -42,6 +40,7 @@ public class Network {
 
     public String request(Map<String, String> queryString) throws ResponseException, IOException {
         StringBuilder params = new StringBuilder();
+        //setting queryString
         Iterator<String> iterator = queryString.keySet().iterator();
         while (iterator.hasNext()) {
             String queryName = iterator.next();
@@ -62,8 +61,6 @@ public class Network {
             reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8"));
         } else {
             reader = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
-            reader.close();
-            urlConnection.disconnect();
             throw new ResponseException(responseCode);
         }
 

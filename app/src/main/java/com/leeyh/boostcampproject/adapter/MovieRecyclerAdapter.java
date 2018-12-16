@@ -1,22 +1,18 @@
 package com.leeyh.boostcampproject.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.databinding.RecyclerViewItemBinding;
-import com.leeyh.boostcampproject.helper.ListDiffUtill;
+import com.leeyh.boostcampproject.helper.ListDiffUtil;
 import com.leeyh.boostcampproject.model.MovieModel;
+import com.leeyh.boostcampproject.viewmodel.MainActivityViewModel;
 
 import java.util.ArrayList;
 
@@ -24,6 +20,11 @@ import java.util.ArrayList;
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.MovieViewHolder> {
 
     private ArrayList<MovieModel> mItems = new ArrayList<>();
+    private FragmentActivity mActivity;
+
+    public MovieRecyclerAdapter(FragmentActivity activity) {
+        mActivity = activity;
+    }
 
     static class MovieViewHolder extends RecyclerView.ViewHolder {
 
@@ -45,21 +46,14 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
 
     @Override
     public void onBindViewHolder(@NonNull final MovieViewHolder movieViewHolder, @SuppressLint("RecyclerView") final int i) {
+        //instance ViewModel and bind
+        MainActivityViewModel.MovieViewModelClassFactory factory =
+                new MainActivityViewModel.MovieViewModelClassFactory(movieViewHolder.mBinding.getRoot().getContext());
+        MainActivityViewModel viewModel = ViewModelProviders.of(mActivity, factory).get(MainActivityViewModel.class);
         RecyclerViewItemBinding binding = movieViewHolder.mBinding;
+        binding.setItemHandler(viewModel);
         binding.setMovie(mItems.get(i));
         binding.executePendingBindings();
-        binding.getRoot().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent link = new Intent(Intent.ACTION_VIEW, Uri.parse(mItems.get(i).getLink()));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bundle animation = ActivityOptions.makeCustomAnimation(view.getContext(), R.anim.enter, R.anim.exit).toBundle();
-                    view.getContext().startActivity(link, animation);
-                } else {
-                    view.getContext().startActivity(link);
-                }
-            }
-        });
     }
 
     @Override
@@ -74,7 +68,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     }
 
     public void setItems(ArrayList<MovieModel> items) {
-        ListDiffUtill diffCallback = new ListDiffUtill(this.mItems, items);
+        ListDiffUtil diffCallback = new ListDiffUtil(this.mItems, items);
         final DiffUtil.DiffResult newItems = DiffUtil.calculateDiff(diffCallback);
         this.mItems.clear();
         this.mItems.addAll(items);

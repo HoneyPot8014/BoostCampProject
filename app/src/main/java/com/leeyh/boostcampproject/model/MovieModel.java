@@ -96,10 +96,11 @@ public class MovieModel extends BaseObservable {
         notifyPropertyChanged(BR.userRating);
     }
 
+    //to compare old recyclerView list and new list, override equals.
     @Override
     public boolean equals(Object obj) {
         boolean same = false;
-        if (obj != null && obj instanceof MovieModel) {
+        if (obj instanceof MovieModel) {
             same = (this.actor.equals(((MovieModel) obj).actor)) && (this.director.equals(((MovieModel) obj).director))
                     && (this.image.equals(((MovieModel) obj).image)) && this.link.equals(((MovieModel) obj).link)
                     && (this.pubDate.equals(((MovieModel) obj).pubDate)) && (this.subtitle.equals(((MovieModel) obj).subtitle))

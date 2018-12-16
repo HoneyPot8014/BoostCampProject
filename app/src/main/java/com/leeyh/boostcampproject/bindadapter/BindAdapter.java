@@ -1,10 +1,8 @@
 package com.leeyh.boostcampproject.bindadapter;
 
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
 import android.view.View;
@@ -15,10 +13,10 @@ import android.widget.Toast;
 
 import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.adapter.MovieRecyclerAdapter;
-import com.leeyh.boostcampproject.helper.Cache;
 import com.leeyh.boostcampproject.helper.ExceptionHandle;
 import com.leeyh.boostcampproject.helper.Network;
 import com.leeyh.boostcampproject.model.MovieModel;
+import com.leeyh.boostcampproject.repository.Cache;
 import com.leeyh.boostcampproject.repository.MovieDataRepository;
 import com.leeyh.boostcampproject.repository.OnNetworkExceptionOccurred;
 

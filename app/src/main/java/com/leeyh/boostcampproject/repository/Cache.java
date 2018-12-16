@@ -1,4 +1,4 @@
-package com.leeyh.boostcampproject.helper;
+package com.leeyh.boostcampproject.repository;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;

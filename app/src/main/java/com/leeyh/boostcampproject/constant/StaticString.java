@@ -31,7 +31,6 @@ public class StaticString {
     public static final int CACHE_SIZE = 1024 * 1024 * 4;
 
     //default request StringQuery
-    public static final String DEFAULT_DISPLAY = "10";
     public static final String DEFAULT_START = "1";
 
 }

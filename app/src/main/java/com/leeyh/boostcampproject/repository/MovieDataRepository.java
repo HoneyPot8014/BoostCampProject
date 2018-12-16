@@ -1,11 +1,9 @@
 package com.leeyh.boostcampproject.repository;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
-import com.leeyh.boostcampproject.helper.Cache;
 import com.leeyh.boostcampproject.helper.Network;
 import com.leeyh.boostcampproject.helper.ResponseException;
 import com.leeyh.boostcampproject.model.MovieModel;
@@ -48,6 +46,14 @@ public class MovieDataRepository {
         this.mGson = new Gson();
     }
 
+    public Bitmap loadImage(String... url) throws ExecutionException, InterruptedException {
+        if (mNetworkStatusListener == null) {
+            return new AsyncLoadImage(mNetworkExceptionListener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url).get();
+        } else {
+            return new AsyncLoadImage(mNetworkExceptionListener, mNetworkStatusListener).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, url).get();
+        }
+    }
+
     public ArrayList<MovieModel> getMovieList(String query, String start) throws ExecutionException, InterruptedException, JSONException {
         String response = new AsyncRequest(mNetworkExceptionListener, mNetworkStatusListener).execute(query, start).get();
         ArrayList<MovieModel> items = new ArrayList<>();
@@ -61,14 +67,6 @@ public class MovieDataRepository {
             items.add(item);
         }
         return items;
-    }
-
-    public Bitmap loadImage(String... url) throws ExecutionException, InterruptedException {
-        if (mNetworkStatusListener == null) {
-            return new AsyncLoadImage(mNetworkExceptionListener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url).get();
-        } else {
-            return new AsyncLoadImage(mNetworkExceptionListener, mNetworkStatusListener).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, url).get();
-        }
     }
 
     public String getQuery() {
@@ -158,17 +156,13 @@ public class MovieDataRepository {
                 new MovieDataRepository(mNetworkExceptionListener, mNetworkStatusListener).loadImage(urls);
             } catch (JSONException e) {
                 e.printStackTrace();
+                mNetworkExceptionListener.onHandleError(e);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                mNetworkExceptionListener.onHandleError(e);
             } catch (ExecutionException e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    mNetwork.reader.close();
-                    mNetwork.urlConnection.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mNetworkExceptionListener.onHandleError(e);
             }
         }
 
@@ -207,6 +201,11 @@ public class MovieDataRepository {
                             if (bitmap != null) {
                                 Cache.getCache().put(strings[0], bitmap);
                             }
+                            if(isCancelled()) {
+                                //if interrupted close IO
+                                mNetwork.reader.close();
+                                mNetwork.urlConnection.disconnect();
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -228,17 +227,6 @@ public class MovieDataRepository {
         protected void onProgressUpdate(Exception... values) {
             super.onProgressUpdate(values);
             handleError(values[0]);
-        }
-
-        @Override
-        protected void onCancelled(Bitmap bitmap) {
-            super.onCancelled(bitmap);
-            try {
-                mNetwork.reader.close();
-                mNetwork.urlConnection.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         @Override

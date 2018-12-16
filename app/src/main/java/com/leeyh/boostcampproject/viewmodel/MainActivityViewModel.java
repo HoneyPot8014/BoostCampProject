@@ -54,6 +54,7 @@ public class MainActivityViewModel extends ViewModel {
         progressBuilder.setView(R.layout.progress);
         progress = progressBuilder.create();
 
+        //register listener to handle error and background working to notify
         this.mRepository = new MovieDataRepository(new OnNetworkExceptionOccurred() {
             @Override
             public void onHandleError(Exception e) {
@@ -100,6 +101,8 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     private Boolean queryCheck(View view) {
+        //not allowed to search with blank
+        //to reduce networking, same query is not allowed
         if (mEditTextGetText.getValue() == null) {
             Toast.makeText(view.getContext(), R.string.can_not_research, Toast.LENGTH_SHORT).show();
             return false;
@@ -136,8 +139,8 @@ public class MainActivityViewModel extends ViewModel {
         @SuppressLint("ClickableViewAccessibility")
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (mEditTextGetText.getValue() != null) {
-                if (mEditTextGetText.getValue().length() != 0) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                if (mEditTextGetText.getValue() != null && mEditTextGetText.getValue().length() != 0) {
                     mEditTextGetText.setValue("");
                 }
             }
@@ -149,8 +152,8 @@ public class MainActivityViewModel extends ViewModel {
         @Override
         public void onScrollStateChanged(@NonNull final RecyclerView recyclerView, int newState) {
             if (!recyclerView.canScrollVertically(1)) {
-                //if recyclerView focus on bottom item handle
-                if (mMovieDataList.size() < mRepository.getTotal()) {
+                //if recyclerView focus on bottom get items
+                if (mMovieDataList.size() < mMovieListSize.getValue()) {
                     if (mNetwork.networkStatus(recyclerView.getContext())) {
                         try {
                             mMovieDataList.addAll(mRepository.getMovieList(mRepository.getQuery(), String.valueOf(mRepository.getStart() + 10)));
@@ -161,6 +164,7 @@ public class MainActivityViewModel extends ViewModel {
                         }
                     }
                 } else {
+                    //Toast message only one time emit
                     if (shouldShowEndData) {
                         Toast.makeText(recyclerView.getContext(), R.string.end_data, Toast.LENGTH_SHORT).show();
                         shouldShowEndData = !shouldShowEndData;

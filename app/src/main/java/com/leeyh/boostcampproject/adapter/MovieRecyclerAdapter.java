@@ -2,14 +2,12 @@ package com.leeyh.boostcampproject.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.leeyh.boostcampproject.R;
 import com.leeyh.boostcampproject.databinding.RecyclerViewItemBinding;
+import com.leeyh.boostcampproject.helper.ListDiffUtill;
 import com.leeyh.boostcampproject.model.MovieModel;
 
 import java.util.ArrayList;
@@ -46,9 +45,10 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
 
     @Override
     public void onBindViewHolder(@NonNull final MovieViewHolder movieViewHolder, @SuppressLint("RecyclerView") final int i) {
-        movieViewHolder.mBinding.setMovie(mItems.get(i));
-        movieViewHolder.mBinding.executePendingBindings();
-        movieViewHolder.mBinding.getRoot().setOnClickListener(new View.OnClickListener() {
+        RecyclerViewItemBinding binding = movieViewHolder.mBinding;
+        binding.setMovie(mItems.get(i));
+        binding.executePendingBindings();
+        binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent link = new Intent(Intent.ACTION_VIEW, Uri.parse(mItems.get(i).getLink()));
@@ -74,7 +74,10 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     }
 
     public void setItems(ArrayList<MovieModel> items) {
-        this.mItems = items;
-        notifyDataSetChanged();
+        ListDiffUtill diffCallback = new ListDiffUtill(this.mItems, items);
+        final DiffUtil.DiffResult newItems = DiffUtil.calculateDiff(diffCallback);
+        this.mItems.clear();
+        this.mItems.addAll(items);
+        newItems.dispatchUpdatesTo(this);
     }
 }
